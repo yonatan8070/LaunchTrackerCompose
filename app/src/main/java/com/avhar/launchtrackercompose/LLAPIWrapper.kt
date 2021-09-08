@@ -39,6 +39,7 @@ class LLAPIWrapper {
 
                         var name = jsonLaunch.getString("name")
                         var provider = jsonLaunch.getJSONObject("launch_service_provider").getString("name")
+                        var type = jsonLaunch.getJSONObject("launch_service_provider").getString("type")
 
                         var formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
 
@@ -46,7 +47,20 @@ class LLAPIWrapper {
                         var winStart = formatter.parse(jsonLaunch.getString("window_start"))
                         var winEnd = formatter.parse(jsonLaunch.getString("window_end"))
 
-                        launchList.add(Launch(name, provider, net, winStart, winEnd))
+                        var imageURL = jsonLaunch.getJSONObject("launch_service_provider").getString("image_url")
+
+                        launchList.add(
+                            Launch(
+                                name = name,
+                                provider = provider,
+                                net = net,
+                                windowStart = winStart,
+                                windowEnd = winEnd,
+                                description = "",
+                                imageURL = imageURL,
+                                type = type,
+                            )
+                        )
                     }
                 },
                 { error: VolleyError ->
