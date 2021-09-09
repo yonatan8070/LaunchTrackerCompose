@@ -1,5 +1,6 @@
 package com.avhar.launchtrackercompose
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -16,8 +17,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.avhar.launchtrackercompose.data.Launch
 import com.avhar.launchtrackercompose.ui.theme.LaunchTrackerComposeTheme
@@ -25,6 +26,7 @@ import com.avhar.launchtrackercompose.ui.theme.LaunchTrackerComposeTheme
 class MainActivity : ComponentActivity() {
     var handler: Handler = Handler(Looper.getMainLooper())
 
+    @ExperimentalMaterialApi
     @ExperimentalAnimationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +34,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@ExperimentalMaterialApi
 @ExperimentalAnimationApi
 @Preview(showBackground = true)
 @Composable
@@ -56,7 +59,7 @@ fun MainUI() {
                     )
                 ) {
                     itemsIndexed(launchList) { index, launch ->
-                        LaunchCard(launchData = launch, index = index)
+                        LaunchCard(launch = launch, index = index)
                     }
                 }
             }
@@ -64,15 +67,24 @@ fun MainUI() {
     }
 }
 
+@ExperimentalMaterialApi
 @ExperimentalAnimationApi
 @Preview
 @Composable
-fun LaunchCard(launchData: Launch = Launch(), index: Int = 0) {
+fun LaunchCard(launch: Launch = Launch(), index: Int = 0) {
+    val context = LocalContext.current
+
     Card(
         modifier = Modifier
             .wrapContentHeight(),
         shape = RoundedCornerShape(8.dp),
-        elevation = 8.dp
+        elevation = 8.dp,
+        onClick = {
+            val i = Intent(context, DetailsActivity::class.java)
+            i.putExtra("launch", launch)
+
+            context.startActivity(i)
+        }
     ) {
         Column(
             modifier = Modifier
@@ -84,12 +96,12 @@ fun LaunchCard(launchData: Launch = Launch(), index: Int = 0) {
             Column(
                 modifier = Modifier.absolutePadding(8.dp, 8.dp, 8.dp, 8.dp)
             ) {
-                Text(text = launchData.name)
-                Text(text = "${launchData.provider} - ${launchData.type}")
+                Text(text = launch.name)
+                Text(text = "${launch.provider} - ${launch.type}")
                 Box(modifier = Modifier
                     .fillMaxWidth()
                     .padding(0.dp, 8.dp, 0.dp, 0.dp), contentAlignment = Alignment.Center) {
-                    CountdownText(target = launchData.net, clockOffset = index * 50)
+                    CountdownText(target = launch.net, clockOffset = index * 50)
                 }
             }
             Surface(

@@ -14,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -31,17 +30,20 @@ class DetailsActivity : ComponentActivity() {
     @ExperimentalAnimationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val launch: Launch = this.intent.getSerializableExtra("launch") as Launch
+
         setContent {
-            DetailsActivityUI()
+            DetailsActivityUI(launch)
         }
     }
 }
 
 @ExperimentalCoilApi
 @ExperimentalAnimationApi
-// @Preview(showBackground = true, device = Devices.PIXEL_3, showSystemUi = true)
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun DetailsActivityUI() {
+fun DetailsActivityUI(launch: Launch = Launch()) {
     LaunchTrackerComposeTheme {
         Box {
             Column(
@@ -52,10 +54,10 @@ fun DetailsActivityUI() {
                     .padding(start = 0.dp, end = 0.dp, top = 0.dp, bottom = 84.dp)
                     .verticalScroll(rememberScrollState())
             ) {
-//                TitleCard()
-                ImageCard()
-                TimeCard()
-                RocketCard()
+                TitleCard(launch)
+                ImageCard(launch.imageURL)
+                TimeCard(launch)
+                RocketCard(launch.rocket)
             }
             Card(
                 modifier = Modifier
@@ -89,24 +91,19 @@ fun TitleCard(launch: Launch = Launch()) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentHeight(),
+                .wrapContentHeight()
+                .padding(8.dp),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.Start
         ) {
-            Column(
-                modifier = Modifier
-                    .absolutePadding(8.dp, 8.dp, 8.dp, 8.dp)
-                    .fillMaxWidth()
-            ) {
-                Text(
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
-                    text = launch.name,
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Medium
-                )
-                Text(text = "${launch.provider} - ${launch.type}")
-                Text(text = launch.description)
-            }
+            Text(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                text = launch.name,
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Medium
+            )
+            Text(text = "${launch.provider} - ${launch.type}")
+            Text(text = launch.description)
         }
     }
 }
@@ -127,13 +124,12 @@ fun ImageCard(imageURL: String = "https://spacelaunchnow-prod-east.nyc3.digitalo
             contentDescription = null,
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(64.dp, 384.dp)
+                .heightIn(max = 384.dp)
         )
 
     }
 }
 
-@Preview
 @Composable
 fun TimeCard(launch: Launch = Launch()) {
     val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
