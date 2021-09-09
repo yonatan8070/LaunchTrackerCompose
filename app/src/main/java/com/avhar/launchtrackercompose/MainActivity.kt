@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.avhar.launchtrackercompose.data.Launch
 import com.avhar.launchtrackercompose.ui.theme.LaunchTrackerComposeTheme
 
 class MainActivity : ComponentActivity() {
@@ -71,7 +72,7 @@ fun LaunchCard(launchData: Launch = Launch(), index: Int = 0) {
         modifier = Modifier
             .wrapContentHeight(),
         shape = RoundedCornerShape(8.dp),
-        elevation = Dp(8F)
+        elevation = 8.dp
     ) {
         Column(
             modifier = Modifier
@@ -81,11 +82,13 @@ fun LaunchCard(launchData: Launch = Launch(), index: Int = 0) {
             horizontalAlignment = Alignment.Start
         ) {
             Column(
-                modifier = Modifier.absolutePadding(Dp(8F), Dp(8F), Dp(8F), Dp(8F))
+                modifier = Modifier.absolutePadding(8.dp, 8.dp, 8.dp, 8.dp)
             ) {
                 Text(text = launchData.name)
-                Text(text = launchData.provider)
-                Box(modifier = Modifier.fillMaxWidth().padding(0.dp, 8.dp, 0.dp, 0.dp), contentAlignment = Alignment.Center) {
+                Text(text = "${launchData.provider} - ${launchData.type}")
+                Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(0.dp, 8.dp, 0.dp, 0.dp), contentAlignment = Alignment.Center) {
                     CountdownText(target = launchData.net, clockOffset = index * 50)
                 }
             }

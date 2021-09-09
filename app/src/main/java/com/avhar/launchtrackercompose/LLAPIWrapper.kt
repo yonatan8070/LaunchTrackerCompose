@@ -7,9 +7,12 @@ import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.*
+import com.avhar.launchtrackercompose.data.Launch
+import com.avhar.launchtrackercompose.data.Rocket
 import org.json.JSONObject
 import java.io.File
 import java.text.SimpleDateFormat
+import java.util.*
 
 class LLAPIWrapper {
     companion object {
@@ -28,26 +31,32 @@ class LLAPIWrapper {
 
             val url = "https://lldev.thespacedevs.com/2.2.0/launch/upcoming/?mode=detailed&hide_recent_previous=true"
 
-            var launchList = mutableStateListOf<Launch>()
+            val launchList = mutableStateListOf<Launch>()
             val req = JsonObjectRequest(Request.Method.GET, url, null,
                 { response: JSONObject ->
                     println("Response received from $url")
-                    var launchArray = response.getJSONArray("results")
+                    val launchArray = response.getJSONArray("results")
 
                     for (i in 0 until launchArray.length()) {
-                        var jsonLaunch = launchArray.getJSONObject(i)
+                        println(i)
+                        val jsonLaunch = launchArray.getJSONObject(i)
 
-                        var name = jsonLaunch.getString("name")
-                        var provider = jsonLaunch.getJSONObject("launch_service_provider").getString("name")
-                        var type = jsonLaunch.getJSONObject("launch_service_provider").getString("type")
+                        val name: String = if (!jsonLaunch.isNull("mission")) {
+                            jsonLaunch.getJSONObject("mission").getString("name")
+                        } else {
+                            jsonLaunch.getString("name")
+                        }
+                        val provider = jsonLaunch.getJSONObject("launch_service_provider").getString("name")
+                        val type = jsonLaunch.getJSONObject("launch_service_provider").getString("type")
 
-                        var formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+                        val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+                        formatter.timeZone = TimeZone.getTimeZone("UTC")
 
-                        var net = formatter.parse(jsonLaunch.getString("net"))
-                        var winStart = formatter.parse(jsonLaunch.getString("window_start"))
-                        var winEnd = formatter.parse(jsonLaunch.getString("window_end"))
+                        val net = formatter.parse(jsonLaunch.getString("net"))
+                        val winStart = formatter.parse(jsonLaunch.getString("window_start"))
+                        val winEnd = formatter.parse(jsonLaunch.getString("window_end"))
 
-                        var imageURL = jsonLaunch.getJSONObject("launch_service_provider").getString("image_url")
+                        val imageURL = jsonLaunch.getString("image")
 
                         launchList.add(
                             Launch(
@@ -59,6 +68,7 @@ class LLAPIWrapper {
                                 description = "",
                                 imageURL = imageURL,
                                 type = type,
+                                rocket = Rocket()
                             )
                         )
                     }

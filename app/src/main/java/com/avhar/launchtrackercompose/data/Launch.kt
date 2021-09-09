@@ -1,6 +1,8 @@
-package com.avhar.launchtrackercompose
+package com.avhar.launchtrackercompose.data
 
+import java.io.Serializable
 import java.util.*
+
 
 data class Launch(
     val name: String,
@@ -10,16 +12,18 @@ data class Launch(
     val windowEnd: Date?,
     val description: String,
     val imageURL: String,
-    val type: String
-) {
+    val type: String,
+    val rocket: Rocket
+) : Serializable {
     constructor() : this(
         name = "Mission name",
         provider = "Mission provider",
-        net = null,
-        windowStart = null,
-        windowEnd = null,
+        net = Date(1633796462000),
+        windowStart = Date(1633796462000),
+        windowEnd = Date(1633796462000),
         description = "Mission description",
         imageURL = "Image URL",
-        type = "Mission type"
+        type = "Mission type",
+        rocket = Rocket()
     )
 }
