@@ -56,7 +56,41 @@ class LLAPIWrapper {
                         val winStart = formatter.parse(jsonLaunch.getString("window_start"))
                         val winEnd = formatter.parse(jsonLaunch.getString("window_end"))
 
+                        val description = if (!jsonLaunch.isNull("mission")) {
+                            jsonLaunch.getJSONObject("mission").getString("description")
+                        } else {
+                            "Description unavailable"
+                        }
+
                         val imageURL = jsonLaunch.getString("image")
+
+
+                        val jsonRocket = jsonLaunch.getJSONObject("rocket").getJSONObject("configuration")
+
+                        val rocketName = jsonRocket.optString("name")
+                        val rocketCost = jsonRocket.optString("launch_cost")
+                        val rocketStages = jsonRocket.optInt("max_stage")
+                        val penisLength = jsonRocket.optDouble("length")
+                        val rocketDiameter = jsonRocket.optDouble("diameter")
+                        val rocketMass = jsonRocket.optDouble("launch_mass", 0.0)
+                        val totalLaunches = jsonRocket.optInt("total_launch_count")
+                        val successfulLaunches = jsonRocket.optInt("successful_launches")
+                        val consecutiveSuccessfulLaunches = jsonRocket.optInt("consecutive_successful_launches")
+                        val infoLink = jsonRocket.optString("wiki_url")
+
+                        val rocket = Rocket(
+                            name = rocketName,
+                            cost = rocketCost,
+                            stages = rocketStages,
+                            length = penisLength,
+                            diameter = rocketDiameter,
+                            mass = rocketMass,
+                            totalLaunches = totalLaunches,
+                            successfulLaunches = successfulLaunches,
+                            consecutiveSuccessfulLaunches = consecutiveSuccessfulLaunches,
+                            infoLink = infoLink,
+                        )
+
 
                         launchList.add(
                             Launch(
@@ -65,10 +99,10 @@ class LLAPIWrapper {
                                 net = net,
                                 windowStart = winStart,
                                 windowEnd = winEnd,
-                                description = "",
+                                description = description,
                                 imageURL = imageURL,
                                 type = type,
-                                rocket = Rocket()
+                                rocket = rocket
                             )
                         )
                     }
