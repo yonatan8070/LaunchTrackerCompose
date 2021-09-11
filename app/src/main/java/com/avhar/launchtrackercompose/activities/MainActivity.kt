@@ -1,9 +1,7 @@
-package com.avhar.launchtrackercompose
+package com.avhar.launchtrackercompose.activities
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -20,12 +18,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.avhar.launchtrackercompose.CountdownText
+import com.avhar.launchtrackercompose.APIUtils
 import com.avhar.launchtrackercompose.data.Launch
 import com.avhar.launchtrackercompose.ui.theme.LaunchTrackerComposeTheme
 
 class MainActivity : ComponentActivity() {
-    var handler: Handler = Handler(Looper.getMainLooper())
-
     @ExperimentalMaterialApi
     @ExperimentalAnimationApi
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,7 +37,7 @@ class MainActivity : ComponentActivity() {
 @Preview(showBackground = true)
 @Composable
 fun MainUI() {
-    var launchList = LLAPIWrapper.getAPIData()
+    var launchList = APIUtils.getLL2Data()
 
     LaunchTrackerComposeTheme {
         // A surface container using the 'background' color from the theme
@@ -69,7 +67,6 @@ fun MainUI() {
 
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
-@Preview
 @Composable
 fun LaunchCard(launch: Launch = Launch(), index: Int = 0) {
     val context = LocalContext.current
@@ -98,9 +95,11 @@ fun LaunchCard(launch: Launch = Launch(), index: Int = 0) {
             ) {
                 Text(text = launch.name)
                 Text(text = "${launch.provider} - ${launch.type}")
-                Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(0.dp, 8.dp, 0.dp, 0.dp), contentAlignment = Alignment.Center) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(0.dp, 8.dp, 0.dp, 0.dp), contentAlignment = Alignment.Center
+                ) {
                     CountdownText(target = launch.net, clockOffset = index * 50)
                 }
             }

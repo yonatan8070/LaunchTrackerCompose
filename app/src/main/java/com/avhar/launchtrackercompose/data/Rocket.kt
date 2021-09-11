@@ -8,7 +8,7 @@ data class Rocket(
     val stages: Int,
     val length: Double,
     val diameter: Double,
-    val mass: Double,
+    val mass: Int,
     val totalLaunches: Int,
     val successfulLaunches: Int,
     val consecutiveSuccessfulLaunches: Int,
@@ -16,11 +16,11 @@ data class Rocket(
 ) : Serializable {
     constructor() : this(
         name = "Rocket name",
-        cost = "Launch cost",
+        cost = "69,000,000$",
         stages = 2,
         length = 69.5,
         diameter = 3.5,
-        mass = 303.2,
+        mass = 303,
         totalLaunches = 420,
         successfulLaunches = 69,
         consecutiveSuccessfulLaunches = 42,

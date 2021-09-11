@@ -14,10 +14,10 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
-class LLAPIWrapper {
+class APIUtils {
     companion object {
         @SuppressLint("SimpleDateFormat")
-        fun getAPIData(): SnapshotStateList<Launch> {
+        fun getLL2Data(): SnapshotStateList<Launch> {
             // Instantiate the cache
             val cache = DiskBasedCache(File("./cacheDir/"), 1024 * 1024) // 1MB cap
 
@@ -67,12 +67,12 @@ class LLAPIWrapper {
 
                         val jsonRocket = jsonLaunch.getJSONObject("rocket").getJSONObject("configuration")
 
-                        val rocketName = jsonRocket.optString("name")
+                        val rocketName = jsonRocket.optString("full_name")
                         val rocketCost = jsonRocket.optString("launch_cost")
                         val rocketStages = jsonRocket.optInt("max_stage")
                         val penisLength = jsonRocket.optDouble("length")
                         val rocketDiameter = jsonRocket.optDouble("diameter")
-                        val rocketMass = jsonRocket.optDouble("launch_mass", 0.0)
+                        val rocketMass = jsonRocket.optInt("launch_mass", 0)
                         val totalLaunches = jsonRocket.optInt("total_launch_count")
                         val successfulLaunches = jsonRocket.optInt("successful_launches")
                         val consecutiveSuccessfulLaunches = jsonRocket.optInt("consecutive_successful_launches")
@@ -116,5 +116,6 @@ class LLAPIWrapper {
 
             return launchList;
         }
+
     }
 }

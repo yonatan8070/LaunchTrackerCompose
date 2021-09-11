@@ -1,24 +1,28 @@
-package com.avhar.launchtrackercompose
+package com.avhar.launchtrackercompose.activities
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
+import coil.request.CachePolicy
+import coil.request.ImageRequest
+import com.avhar.launchtrackercompose.CountdownText
 import com.avhar.launchtrackercompose.data.Launch
 import com.avhar.launchtrackercompose.data.Rocket
 import com.avhar.launchtrackercompose.ui.theme.LaunchTrackerComposeTheme
@@ -41,7 +45,7 @@ class DetailsActivity : ComponentActivity() {
 
 @ExperimentalCoilApi
 @ExperimentalAnimationApi
-@Preview(showBackground = true, showSystemUi = true)
+@Preview(showBackground = true, showSystemUi = false)
 @Composable
 fun DetailsActivityUI(launch: Launch = Launch()) {
     LaunchTrackerComposeTheme {
@@ -58,6 +62,7 @@ fun DetailsActivityUI(launch: Launch = Launch()) {
                 ImageCard(launch.imageURL)
                 TimeCard(launch)
                 RocketCard(launch.rocket)
+                Spacer(modifier = Modifier.height(8.dp)) // Here to make scrolling go on a little further
             }
             Card(
                 modifier = Modifier
@@ -72,7 +77,7 @@ fun DetailsActivityUI(launch: Launch = Launch()) {
                         .fillMaxSize(),
                     Alignment.Center
                 ) {
-                    CountdownText()
+                    CountdownText(target = launch.net)
                 }
             }
         }
@@ -97,20 +102,31 @@ fun TitleCard(launch: Launch = Launch()) {
             horizontalAlignment = Alignment.Start
         ) {
             Text(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(bottom = 4.dp),
                 text = launch.name,
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Medium
             )
             Text(text = "${launch.provider} - ${launch.type}")
-            Text(text = launch.description)
+            Text(text = launch.rocket.name)
         }
     }
 }
 
+@ExperimentalAnimationApi
 @ExperimentalCoilApi
 @Composable
 fun ImageCard(imageURL: String = "https://spacelaunchnow-prod-east.nyc3.digitaloceanspaces.com/media/agency_images/spacex_image_20190207032501.jpeg") {
+    val context = LocalContext.current
+    val imagePainter = rememberImagePainter(imageURL, builder = {
+        ImageRequest
+            .Builder(context)
+            .diskCachePolicy(CachePolicy.DISABLED)
+        crossfade(400)
+    })
+
     Card(
         modifier = Modifier
             .padding(start = 8.dp, end = 8.dp, top = 8.dp)
@@ -118,15 +134,19 @@ fun ImageCard(imageURL: String = "https://spacelaunchnow-prod-east.nyc3.digitalo
         shape = RoundedCornerShape(8.dp),
         elevation = 8.dp
     ) {
-        println("Got here")
-        Image(
-            painter = rememberImagePainter(imageURL),
-            contentDescription = null,
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(max = 384.dp)
-        )
-
+        AnimatedContent(targetState = imagePainter,
+            transitionSpec = {
+                slideInHorizontally({ height -> -height }) + fadeIn() with
+                        slideOutHorizontally({ height -> height }) + fadeOut()
+            }) { painter ->
+            Image(
+                painter = painter,
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 384.dp)
+            )
+        }
     }
 }
 
@@ -148,7 +168,9 @@ fun TimeCard(launch: Launch = Launch()) {
                 .fillMaxWidth()
         ) {
             Text(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(bottom = 4.dp),
                 text = "Timetable",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Medium
@@ -157,12 +179,12 @@ fun TimeCard(launch: Launch = Launch()) {
             Text(text = "Window start: ${formatter.format(launch.windowStart)}")
             Text(text = "Window end: ${formatter.format(launch.windowEnd)}")
             Button(
-                onClick = { /*TODO*/ }, modifier = Modifier
+                onClick = { /* TODO once LDAPI comes back online */ }, modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 8.dp)
             ) {
                 Text(
-                    text = "More details",
+                    text = "MORE DETAILS",
                 )
             }
         }
@@ -184,17 +206,19 @@ fun RocketCard(rocket: Rocket = Rocket()) {
                 .fillMaxWidth()
         ) {
             Text(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(bottom = 4.dp),
                 text = rocket.name,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Medium
             )
             RocketInfoLine("Total launches", rocket.totalLaunches.toString())
             RocketInfoLine("Successful launches", rocket.successfulLaunches.toString())
-            RocketInfoLine("Consecutive successful launches", rocket.consecutiveSuccessfulLaunches.toString())
-            RocketInfoLine("Total launches", rocket.totalLaunches.toString())
-            RocketInfoLine("Total launches", rocket.totalLaunches.toString())
-
+            RocketInfoLine("Launch cost", rocket.cost)
+            RocketInfoLine("Length", rocket.length.toString() + "m")
+            RocketInfoLine("Diameter", rocket.diameter.toString() + "m")
+            RocketInfoLine("Mass", (rocket.mass * 1000).toString() + "kg")
         }
     }
 }

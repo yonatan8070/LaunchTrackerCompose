@@ -23,14 +23,6 @@ fun CountdownText(target: Date? = Date(1633796462000), clockOffset: Int = 0) {
     if (target != null) {
         var timeUntilLaunch by remember { mutableStateOf((target.time - System.currentTimeMillis()) / 1000L) }
 
-        val outputText: String = String.format(
-            "T- %02d : %02d : %02d : %02d",
-            timeUntilLaunch / 86400,
-            (timeUntilLaunch / 3600) % 24,
-            (timeUntilLaunch % 3600) / 60,
-            (timeUntilLaunch % 60)
-        )
-
         val days = timeUntilLaunch / 86400
         val hours = (timeUntilLaunch / 3600) % 24
         val minutes = (timeUntilLaunch % 3600) / 60
