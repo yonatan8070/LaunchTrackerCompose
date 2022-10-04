@@ -13,7 +13,8 @@ data class Launch(
     val description: String,
     val imageURL: String,
     val type: String,
-    val rocket: Rocket
+    val rocket: Rocket,
+    val ll2id: String
 ) : Serializable {
     constructor() : this(
         name = "Mission name",
@@ -24,6 +25,7 @@ data class Launch(
         description = "Mission description",
         imageURL = "Image URL",
         type = "Mission type",
-        rocket = Rocket()
+        rocket = Rocket(),
+        ll2id = ""
     )
 }

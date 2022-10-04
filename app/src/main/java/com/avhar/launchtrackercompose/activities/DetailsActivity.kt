@@ -1,5 +1,6 @@
 package com.avhar.launchtrackercompose.activities
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -152,6 +153,7 @@ fun ImageCard(imageURL: String = "https://spacelaunchnow-prod-east.nyc3.digitalo
 
 @Composable
 fun TimeCard(launch: Launch = Launch()) {
+    val context = LocalContext.current
     val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
     formatter.timeZone = TimeZone.getDefault()
 
@@ -179,7 +181,12 @@ fun TimeCard(launch: Launch = Launch()) {
             Text(text = "Window start: ${formatter.format(launch.windowStart)}")
             Text(text = "Window end: ${formatter.format(launch.windowEnd)}")
             Button(
-                onClick = { /* TODO once LDAPI comes back online */ }, modifier = Modifier
+                onClick = {
+                    val i = Intent(context, TimelineActivity::class.java)
+                    i.putExtra("launch", launch)
+
+                    context.startActivity(i)
+                }, modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 8.dp)
             ) {
